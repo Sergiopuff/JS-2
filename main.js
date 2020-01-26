@@ -1,5 +1,35 @@
+const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+
+function makeGetRequest(url) {
+    return new Promise((resolve, reject) => {
+        let xhr;
+        if (window.XMLHttpRequest) {
+            xhr = new window.XMLHttpRequest();
+        } else {
+            xhr = new window.ActiveXObject("Microsoft.XMLHTTP")
+        }
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                resolve(xhr.responseText)
+            }
+            //  else {
+            //     reject("Error")
+            // }
+        }
+
+        // xhr.onreadystatechange = function() {
+        //     if (xhr.readyState === 4) {
+        //         callback(xhr.responseText)
+        //     }
+        // }; 
+
+        xhr.open('GET', url);
+        xhr.send();
+    });
+}
+
 class GoodsItem {
-    constructor(id, title = 'Без названия', price = 0, img = '') {
+    constructor(id, title = 'Без названия', price = 0, img = 'https://via.placeholder.com/250') {
         this.id = id;
         this.title = title;
         this.price = price;
@@ -22,6 +52,37 @@ class GoodsList {
         this.container = document.querySelector(container);
         this.goods = [];
     }
+    initListeners() {}
+    findGood(id) {
+        return this.goods.find(good => good.id === id);
+    }
+    fetchGoods() {}
+    totalSum() {
+        let sum = 0;
+        for (const good of this.goods) {
+            if (good.price) {
+                sum += good.price;
+            }
+        }
+        return sum;
+        // return this.goods.reduce((totalPrice, good) => {
+        //     if (!good.price) return totalPrice;
+        //     totalPrice += good.price;
+        //     return totalPrice;
+        // }, 0)
+    }
+    render() {
+        let listHtml = '';
+        this.goods.forEach(good => {
+            const goodItem = new GoodsItem(good.id, good.product_name, good.price, good.img);
+            listHtml += goodItem.render();
+        });
+        this.container.innerHTML = listHtml;
+        this.initListeners();
+    }
+}
+
+class GoodsPage extends GoodsList {
     initListeners() {
         const buttons = [...this.container.querySelectorAll('.js-add-to-cart')];
         buttons.forEach(button => {
@@ -31,54 +92,44 @@ class GoodsList {
             })
         })
     }
-    findGood(id) {
-        return this.goods.find(good => good.id === id);
+    fetchGoods(callback) {
+        makeGetRequest(`${API_URL}/catalogData.json`, (goods) => {
+            this.goods = JSON.parse(goods);
+            callback();
+        })
     }
     addToCart(goodId) {
-            const good = this.findGood(goodId);
-            console.log(good);
-        }
-        //  2 Задание
-    getTotalSum() {
-        let totalPrice = 0;
-        this.goods.forEach(good => {
-            const price = good.price;
-            totalPrice += price;
-        })
-        console.log(totalPrice);
-    }
-    fetchGoods() {
-        this.goods = [
-            { id: 1, title: "Робот-пылесос xiaomi", price: 20000, img: 'https://via.placeholder.com/250' },
-            { id: 2, title: "Samsung Galaxy", price: 21500, img: 'https://via.placeholder.com/250' },
-            { id: 3, title: "Стиральная машина hotpoint", price: 32000, img: 'https://via.placeholder.com/250' },
-            { id: 4, title: "Умные часы apple watch", price: 26000, img: 'https://via.placeholder.com/250' },
-            { id: 5, title: "Посудомоечная машина bosh", price: 26000, img: 'https://via.placeholder.com/250' },
-        ]
-    }
-    render() {
-        let listHtml = '';
-        this.goods.forEach(good => {
-            const goodItem = new GoodsItem(good.id, good.title, good.price, good.img);
-            listHtml += goodItem.render();
-        });
-        this.container.innerHTML = listHtml;
-        this.initListeners();
+        const good = this.findGood(goodId);
+        console.log(good);
     }
 }
 
-const list = new GoodsList('.goods-list');
-list.fetchGoods();
-list.render();
-list.getTotalSum();
+class Cart extends GoodsList {
+    removeFromCart(goodId) {
 
-
-// 1 Задание (не совсем понял что нужно было сделать)
-class BasketItems extends GoodsList {
-    removeCart() {
-        this.id = id;
     }
-    addCart() {
-        this.id = id;
+    cleanCart() {
+
+    }
+    updateCartItem(goodId, goods) {
+
     }
 }
+
+class CartItem extends GoodsItem {
+    constructor(...attrs) {
+        super(attrs);
+        this.count = 0;
+    }
+    incCount() {
+
+    }
+    decCount() {
+
+    }
+}
+
+const list = new GoodsPage('.goods-list');
+list.fetchGoods(() => {
+    list.render();
+});
