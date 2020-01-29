@@ -1,135 +1,44 @@
-const API_URL = "https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses";
+// const str = "123 abc 456";
 
-function makeGetRequest(url) {
-    return new Promise((resolve, reject) => {
-        let xhr;
-        if (window.XMLHttpRequest) {
-            xhr = new window.XMLHttpRequest();
-        } else {
-            xhr = new window.ActiveXObject("Microsoft.XMLHTTP")
-        }
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                resolve(xhr.responseText)
-            }
-            //  else {
-            //     reject("Error")
-            // }
-        }
+// const regexp1 = /abc/;
+// const regexp2 = /999/;
 
-        // xhr.onreadystatechange = function() {
-        //     if (xhr.readyState === 4) {
-        //         callback(xhr.responseText)
-        //     }
-        // }; 
+// console.log(regexp1.test(str)); // true
+// console.log(regexp2.test(str)); // false
 
-        xhr.open('GET', url);
-        xhr.send();
-    });
+// const str1 = "Geek from GeekBrains";
+// const regexp3 = /Geek/g;
+// console.log(str1.match(regexp3));
+
+// const str3 = "I am Greek geek from Geekbrains";
+// const regexp4 = /(g.+?k)/gi;
+
+// str4 = str3.replace(regexp4, '+$1+');
+// console.log(str4);
+
+// const str5 = '000 1221 133331';
+// const regexp5 =  /1.+?1/g;
+// console.log(str5.match(regexp5));
+
+
+// ДЗ
+
+class ReplacementText {
+    constructor(container = '.text') {
+        this.container = container;
+        this.getText();
+    }
+    getText() {
+        const data = document.querySelector(this.container);
+
+        let rex = /'/g;
+        let res = data.innerHTML.replace((rex), '"');
+
+        rex = /\b"\b/g;
+        res = res.replace((rex), '\'');
+        data.innerHTML = res;
+    }
+
 }
 
-class GoodsItem {
-    constructor(id, title = 'Без названия', price = 0, img = 'https://via.placeholder.com/250') {
-        this.id = id;
-        this.title = title;
-        this.price = price;
-        this.img = img;
-    }
-    render() {
-        return `
-            <div class="goods-item" data-id="${this.id}">
-                <img src="${this.img}" alt="alt">
-                <h3>${this.title}</h3>
-                <p>${this.price}</p>
-                <button class="js-add-to-cart">Добавить</button>
-            </div>
-        `;
-    }
-}
-
-class GoodsList {
-    constructor(container) {
-        this.container = document.querySelector(container);
-        this.goods = [];
-    }
-    initListeners() {}
-    findGood(id) {
-        return this.goods.find(good => good.id === id);
-    }
-    fetchGoods() {}
-    totalSum() {
-        let sum = 0;
-        for (const good of this.goods) {
-            if (good.price) {
-                sum += good.price;
-            }
-        }
-        return sum;
-        // return this.goods.reduce((totalPrice, good) => {
-        //     if (!good.price) return totalPrice;
-        //     totalPrice += good.price;
-        //     return totalPrice;
-        // }, 0)
-    }
-    render() {
-        let listHtml = '';
-        this.goods.forEach(good => {
-            const goodItem = new GoodsItem(good.id, good.product_name, good.price, good.img);
-            listHtml += goodItem.render();
-        });
-        this.container.innerHTML = listHtml;
-        this.initListeners();
-    }
-}
-
-class GoodsPage extends GoodsList {
-    initListeners() {
-        const buttons = [...this.container.querySelectorAll('.js-add-to-cart')];
-        buttons.forEach(button => {
-            button.addEventListener('click', (event) => {
-                const goodId = event.target.parentElement.getAttribute('data-id');
-                this.addToCart(parseInt(goodId, 10));
-            })
-        })
-    }
-    fetchGoods(callback) {
-        makeGetRequest(`${API_URL}/catalogData.json`, (goods) => {
-            this.goods = JSON.parse(goods);
-            callback();
-        })
-    }
-    addToCart(goodId) {
-        const good = this.findGood(goodId);
-        console.log(good);
-    }
-}
-
-class Cart extends GoodsList {
-    removeFromCart(goodId) {
-
-    }
-    cleanCart() {
-
-    }
-    updateCartItem(goodId, goods) {
-
-    }
-}
-
-class CartItem extends GoodsItem {
-    constructor(...attrs) {
-        super(attrs);
-        this.count = 0;
-    }
-    incCount() {
-
-    }
-    decCount() {
-
-    }
-}
-
-const list = new GoodsPage('.goods-list');
-list.fetchGoods(() => {
-    list.render();
-});
+const rpText = new ReplacementText();
