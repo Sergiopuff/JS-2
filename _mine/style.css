@@ -10,8 +10,23 @@ header {
     border-bottom: 1px solid #eee;
 }
 
-.cart-button {
+.cart {
     margin-left: auto;
+    position: relative;
+}
+
+.cart-container {
+    position: absolute;
+    right: 0;
+    top: 35px;
+    min-width: 400px;
+    min-height: 200px;
+    background-color: #fff;
+    border: 1px solid #f6f6f6;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.cart-button {
     border: none;
     -webkit-appearance: none;
     padding: 5px 10px;
@@ -53,3 +68,30 @@ main {
 .goods-item img {
     width: 100%;
 }
+
+.hidden {
+    display: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
